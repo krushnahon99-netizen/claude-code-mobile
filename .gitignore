@@ -7,8 +7,12 @@ __v0_jsx-dev-runtime.ts
 .v0-trash/
 .vercel/
 
-# Environment variables
-.env*.local
+# Environment variables (never commit secrets)
+.env*
+!.env.example
+
+# TypeScript build info
+*.tsbuildinfo
 
 # Common ignores
 node_modules

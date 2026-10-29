@@ -1,0 +1,11 @@
+.gradle/
+.kotlin/
+build/
+/local.properties
+/.idea/
+*.iml
+/captures/
+.cxx/
+
+# proot binaries are downloaded by scripts/fetch-proot.sh, never committed
+/app/src/main/jniLibs/

@@ -66,7 +66,7 @@ git fetch github main && git reset github/main
 
 ## 6. In progress
 
-- Nothing.
+- Milestone 2: the Android skeleton (`android/`) and CI workflow (`.github/workflows/android.yml`) are pushed, and the first **Android APK** CI run hasn't passed yet. Check it with `gh run list --repo krushnahon99-netizen/claude-code-mobile --limit 3`, fix any failure, then tick milestone 2.
 
 ## 7. Milestones
 

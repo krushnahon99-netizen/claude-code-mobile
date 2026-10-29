@@ -66,7 +66,7 @@ git fetch github main && git reset github/main
 
 ## 6. In progress
 
-- Nothing.
+- Milestone 2: the Android skeleton and `.github/workflows/android.yml` are written and pushed. Tick it in §7 once the first **Android APK** CI run is green (`gh run list --repo krushnahon99-netizen/claude-code-mobile --limit 3`).
 
 ## 7. Milestones
 
@@ -112,7 +112,11 @@ Keep this exact format, `N. [x] **Title** — details`: the status page parses i
 | `lib/project-status.ts` | Parses §6, §7, and §10 of this file for the status page |
 | `components/status/` | Status page sections (header, milestones, architecture, activity) |
 | `app/layout.tsx`, `app/globals.css` | Status page metadata, fonts, and dark theme tokens |
-| `android/` | The Android app (added in milestone 2) |
+| `.github/workflows/android.yml` | CI: builds the debug APK and runs unit tests on every push that touches `android/` |
+| `android/gradle/libs.versions.toml` | All Android dependency and plugin versions |
+| `android/app/build.gradle.kts` | App module: SDK levels, arm64-only, jniLibs extraction for proot |
+| `android/app/src/main/java/com/claudecodemobile/` | App code: `MainActivity`, `ui/theme/`, `ui/navigation/`, `ui/components/` |
+| `android/app/src/main/res/` | Strings, window theme, adaptive launcher icon |
 
 ## 10. Milestone log (newest first)
 

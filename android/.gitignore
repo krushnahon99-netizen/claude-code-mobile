@@ -1,0 +1,12 @@
+.gradle/
+.kotlin/
+build/
+captures/
+.idea/
+*.iml
+local.properties
+.externalNativeBuild/
+.cxx/
+
+# proot binaries are downloaded by scripts/fetch-proot.sh at build time.
+app/src/main/jniLibs/

@@ -23,23 +23,24 @@
 Run after every milestone, and before ending any turn that changed files.
 
 1. Update this file: §5 **Current status**, §6 **In progress**, §7 **Next steps** (tick finished items), and add a row to the top of §10 **Milestone log**.
-2. Commit and push to `main`:
+2. Commit and push to GitHub `main` (one line, safe to re-run):
 
    ```bash
-   git add -A && (git diff --cached --quiet || git commit -m "milestone: <what now works>") && git push origin HEAD:main
+   git remote add github https://github.com/krushnahon99-netizen/claude-code-mobile.git 2>/dev/null; git add -A && (git diff --cached --quiet || git commit -m "milestone: <what now works>") && git push github HEAD:main
    ```
 
+   - Push to the `github` remote, and **never change or remove `origin`**: in v0, `origin` can be v0's internal Git (`git.v0.app`), which v0 uses to save versions.
    - Keep `HEAD:main`. After an import, v0 edits on its own working branch, but the next account imports `main`, so `main` must always have the latest work.
    - Low on credits with work half done? Save anyway with `wip: <what's half done>` and describe it in §6.
-   - Push rejected: run `git pull --rebase origin main`, then push again. Never force-push.
+   - Push rejected: run `git pull --rebase github main`, then push again. Never force-push.
    - Authentication error: ask the owner to connect GitHub (v0 settings, top right → Git), then retry.
 
 **Recovery.** If `git status` says "not a git repository" (for example after a sandbox reset), this reconnects to the GitHub history and keeps your current files:
 
 ```bash
 git init -b main
-git remote add origin https://github.com/krushnahon99-netizen/claude-code-mobile.git
-git fetch origin main && git reset origin/main
+git remote add github https://github.com/krushnahon99-netizen/claude-code-mobile.git
+git fetch github main && git reset github/main
 ```
 
 ## 4. Project goal

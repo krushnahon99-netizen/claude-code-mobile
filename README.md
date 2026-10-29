@@ -18,14 +18,17 @@ Everything runs on the phone. There's no separate server.
 
 | Path | What's there |
 | --- | --- |
-| `android/` | The Android app, Kotlin + Jetpack Compose (from milestone 2) |
+| `android/` | The Android app, Kotlin + Jetpack Compose |
+| `.github/workflows/android.yml` | CI that builds the debug APK |
 | `docs/SPEC.md` | Full spec, architecture, and the Claude Code stream-json protocol |
 | `AGENTS.md` | Project memory and progress for the AI assistants building this |
 | `app/`, `components/`, `lib/` | A small Next.js status page for the v0 preview |
 
 ## Getting the APK
 
-From milestone 2, GitHub Actions builds a debug APK on every push. On GitHub, open **Actions**, then the latest **Android APK** run, and download the `claude-code-mobile-debug` artifact.
+GitHub Actions builds a debug APK whenever `android/` changes on `main`. On GitHub, open **Actions**, then the latest **Android APK** run, and download the `claude-code-mobile-debug` artifact. Unzip it and install `app-debug.apk`. Every build is signed with the same debug key, so updates install over each other.
+
+To build locally, open `android/` in Android Studio, or run `./gradlew assembleDebug` in `android/` with JDK 17 and the Android SDK.
 
 ## Requirements
 

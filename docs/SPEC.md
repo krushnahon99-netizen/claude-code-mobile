@@ -38,7 +38,7 @@ Compose UI (screens)  →  ViewModels  →  ClaudeSession (bridge)  →  LinuxEn
   - `jniLibs/arm64-v8a/libproot.so` (the `proot` executable)
   - `jniLibs/arm64-v8a/libproot-loader.so` (`libexec/proot/loader`)
   - `jniLibs/arm64-v8a/libtalloc.so` (DT_NEEDED in `libproot.so` patched from `libtalloc.so.2` with `patchelf`, because Android only extracts files named `lib*.so`)
-- **Why jniLibs:** on Android 10+ an app may only execute files from its `nativeLibraryDir` (W^X). Set `android:extractNativeLibs="true"` and `packaging.jniLibs.useLegacyPackaging = true` so the files are extracted there.
+- **Why jniLibs:** on Android 10+ an app may only execute files from its `nativeLibraryDir` (W^X). Set `packaging.jniLibs.useLegacyPackaging = true` so the files are extracted there. AGP then writes `android:extractNativeLibs="true"` into the merged manifest, so don't add it to the source manifest.
 - **Host environment for proot:** `PROOT_TMP_DIR=<cacheDir>/proot-tmp`, `PROOT_LOADER=<nativeLibraryDir>/libproot-loader.so`, `LD_LIBRARY_PATH=<nativeLibraryDir>`.
 - **Command shape:**
   `libproot.so --kill-on-exit --link2symlink --sysvipc -0 -r <rootfs> -b /dev -b /proc -b /sys -b <fake proc files> -w <cwd> /usr/bin/env -u LD_LIBRARY_PATH -u PROOT_LOADER -u PROOT_TMP_DIR /bin/bash -lc '<command>'`

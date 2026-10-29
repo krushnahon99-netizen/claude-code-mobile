@@ -61,19 +61,20 @@ git fetch github main && git reset github/main
 
 ## 5. Current status
 
-- Milestone 1 done: spec (`docs/SPEC.md`), milestone plan (§7), `README.md`, and the status page at `/`.
-- No Android code yet. Next is milestone 2, the Android project skeleton plus the CI APK build.
+- Milestones 1–2 done. The **Android APK** workflow builds a debug APK on every push to `main` that touches `android/`.
+- The app is a Compose shell: Setup → Login → Projects → Chat, with Files and Settings reachable from Chat. All screens are placeholders, and nothing runs Linux yet.
+- Next is milestone 3, the Linux layer.
 
 ## 6. In progress
 
-- Milestone 2: the Android skeleton (`android/`) and CI workflow (`.github/workflows/android.yml`) are pushed, and the first **Android APK** CI run hasn't passed yet. Check it with `gh run list --repo krushnahon99-netizen/claude-code-mobile --limit 3`, fix any failure, then tick milestone 2.
+- Nothing.
 
 ## 7. Milestones
 
 Keep this exact format, `N. [x] **Title** — details`: the status page parses it.
 
 1. [x] **Plan and docs** — spec in `docs/SPEC.md`, this milestone plan, `README.md`, and the status page.
-2. [ ] **Android project skeleton** — Gradle project in `android/`, Compose app shell (theme, navigation, placeholder screens), and a GitHub Actions workflow that builds a debug APK.
+2. [x] **Android project skeleton** — Gradle project in `android/`, Compose app shell (theme, navigation, placeholder screens), and a GitHub Actions workflow that builds a debug APK.
 3. [ ] **Linux layer** — Termux proot shipped as `libproot.so` jniLibs, rootfs download with SHA-256 check and tar extraction, and the proot command builder and process runner.
 4. [ ] **First-run setup** — setup screen with step progress: storage check, Ubuntu, base packages, Node.js, Claude Code, verify. Resumable steps and a Repair button.
 5. [ ] **Claude Code bridge** — run `claude` with stream-json in and out, `StreamJsonParser` to typed events, the control protocol (initialize, `can_use_tool`, interrupt), and parser unit tests.
@@ -85,13 +86,15 @@ Keep this exact format, `N. [x] **Title** — details`: the status page parses i
 
 ## 8. Tech stack and conventions
 
-**Android app (`android/`, from milestone 2)**
+**Android app (`android/`)**
 
-- Kotlin 2.1, Android Gradle Plugin 8.7, Gradle 8.11, JDK 17. Package `com.claudecodemobile`.
-- Jetpack Compose (BOM 2024.12.01), Material 3, navigation-compose, kotlinx-serialization-json, coroutines, Apache Commons Compress, androidx security-crypto.
-- minSdk 26, compile/target SDK 35, `arm64-v8a` only.
+- Kotlin 2.1.0, Android Gradle Plugin 8.7.3, Gradle 8.11.1 (wrapper committed, so use `./gradlew`), JDK 17. Package `com.claudecodemobile`. Every version is in `android/gradle/libs.versions.toml`.
+- Jetpack Compose (BOM 2024.12.01), Material 3, material-icons-extended, type-safe navigation-compose 2.8 (`@Serializable` routes in `ui/navigation/Routes.kt`), kotlinx-serialization-json, and coroutines. Add Apache Commons Compress (milestone 3) and androidx security-crypto (milestone 9) when they're needed.
+- minSdk 26, compile/target SDK 35, `arm64-v8a` only. In CI, `versionCode` is the run number and `versionName` is `0.1.<run>`.
+- Code layout: `setup/`, `ui/theme/`, `ui/navigation/`, `ui/components/`, and one package per screen under `ui/`. UI strings are inline in Compose for now.
 - proot binaries are **not committed**. `android/scripts/fetch-proot.sh` downloads them in CI into `app/src/main/jniLibs/arm64-v8a/`, which is gitignored.
-- The v0 sandbox has no JDK or Android SDK, so **CI is the compiler**. After pushing, check `gh run list --repo krushnahon99-netizen/claude-code-mobile --limit 3`, and read failures with `gh run view <id> --log-failed`.
+- The v0 sandbox has no JDK or Android SDK, so **CI is the compiler**. A build takes about 4 minutes. After pushing, check `gh run list --repo krushnahon99-netizen/claude-code-mobile --limit 3` and read failures with `gh run view <id> --log-failed`. If you use `gh run watch`, give the Bash call a timeout of about 10 minutes, because the default 2-minute limit kills it.
+- To avoid a wasted CI run, check that a Material icon exists before using it: list the classes in `material-icons-extended-android-1.7.6.aar` from Google Maven.
 
 **Status page (repo root)**
 
@@ -112,7 +115,11 @@ Keep this exact format, `N. [x] **Title** — details`: the status page parses i
 | `lib/project-status.ts` | Parses §6, §7, and §10 of this file for the status page |
 | `components/status/` | Status page sections (header, milestones, architecture, activity) |
 | `app/layout.tsx`, `app/globals.css` | Status page metadata, fonts, and dark theme tokens |
-| `android/` | The Android app (added in milestone 2) |
+| `.github/workflows/android.yml` | CI: builds the debug APK and runs unit tests when `android/` changes on `main` |
+| `android/gradle/libs.versions.toml` | Android dependency and plugin versions |
+| `android/app/build.gradle.kts` | App module: SDK levels, arm64 only, debug signing, jniLibs extraction for proot |
+| `android/debug.keystore` | Shared debug signing key (not a secret, see §11) |
+| `android/app/src/main/java/com/claudecodemobile/` | App code: `MainActivity`, `setup/`, `ui/theme/`, `ui/navigation/`, `ui/components/`, and one package per screen |
 
 ## 10. Milestone log (newest first)
 
@@ -120,6 +127,7 @@ This file is loaded into every AI turn, so keep it short: keep about 15 rows her
 
 | # | Date | Milestone | By |
 | --- | --- | --- | --- |
+| 3 | 2026-10-29 | Android skeleton: Gradle project, Compose shell with 6 placeholder screens, and a CI workflow that builds the debug APK | Chatbot 3 (v0) |
 | 2 | 2026-10-29 | Plan and docs: spec in `docs/SPEC.md`, 10-milestone plan, README, status page | Chatbot 2 (v0) |
 | 1 | 2026-10-29 | Created the GitHub repo and the AGENTS.md handoff and save system | Chatbot 1 (v0) |
 
@@ -134,6 +142,9 @@ This file is loaded into every AI turn, so keep it short: keep about 15 rows her
 - 2026-10-29: Approve/Deny uses the Agent SDK's stdio control protocol (`--permission-prompt-tool stdio`), not a separate MCP server.
 - 2026-10-29: Account login runs `claude auth login` (the code is pasted through stdin), and the CLI keeps those credentials in the app-private rootfs. API keys, base URL, and token go in EncryptedSharedPreferences.
 - 2026-10-29: Projects default to the app-private folder `/root/projects` inside the rootfs, which has full Linux file semantics. Shared storage access is optional and comes later.
+- 2026-10-29: Debug APKs are signed with the committed `android/debug.keystore` (password `android`), so every CI build installs over the last one and keeps the downloaded Linux environment. It's not a secret. A release key would go in GitHub secrets instead.
+- 2026-10-29: CI caches Gradle with `actions/setup-java` (`cache: gradle`). We don't use `gradle/actions` v6, because its caching component comes with proprietary terms of use.
+- 2026-10-29: The `v0/android-app` branch is an earlier skeleton attempt that was never merged. It's superseded by `main`, so ignore it.
 
 ## 12. For the owner
 
@@ -143,4 +154,4 @@ This file is loaded into every AI turn, so keep it short: keep about 15 rows her
 2. Send: **"Read AGENTS.md and continue the project. After every milestone, commit and push to GitHub main without asking me."**
 3. Optional: add that sentence as a v0 Rule (settings → Rules) so every chat in the account follows it.
 
-**Getting the app (from milestone 2):** on GitHub, open **Actions**, then the latest **Android APK** run, and download the `claude-code-mobile-debug` artifact. Unzip it and install the APK on your phone (allow installs from unknown sources).
+**Getting the app:** on GitHub, open **Actions**, then the latest green **Android APK** run, and download the `claude-code-mobile-debug` artifact. Unzip it and install `app-debug.apk` on your phone (allow installs from unknown sources). Newer builds install over older ones and keep your setup.
